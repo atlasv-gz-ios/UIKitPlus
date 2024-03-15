@@ -37,7 +37,7 @@ public protocol LifecycleBuilderProtocol: AnyObject, AppBuilderContent {
     func handleLocalAction(_ handler: @escaping (_ identifier: String?, _ notification: UILocalNotification, _ completionHandler: @escaping () -> Void) -> Void) -> Self
     func handleRemoteActionWithResponseInfo(_ handler: @escaping (_ identifier: String?, _ remoteNotification: [AnyHashable : Any], _ responseInfo: [AnyHashable : Any], _ completionHandler: @escaping () -> Void) -> Void) -> Self
     func handleRemoteAction(_ handler: @escaping (_ identifier: String?, _ remoteNotification: [AnyHashable : Any], _ completionHandler: @escaping () -> Void) -> Void) -> Self
-    func didReceiveRemoteNotification(_ handler: @escaping (_ userInfo: [AnyHashable : Any], _ completionHandler: (UIBackgroundFetchResult) -> Void) -> Void) -> Self
+    func didReceiveRemoteNotification(_ handler: @escaping (_ userInfo: [AnyHashable : Any], _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void) -> Self
     func performFetch(_ handler: @escaping (_ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void) -> Self
     func performActionForShortcutItem(_ handler: @escaping (_ shortcutItem: UIApplicationShortcutItem, _ completionHandler: @escaping (Bool) -> Void) -> Void) -> Self
     func handleEventsForBackgroundURLSession(_ handler: @escaping (_ identifier: String, _ completionHandler: @escaping () -> Void) -> Void) -> Self
@@ -296,7 +296,7 @@ class LifecycleBuilder: _LifecycleBuilderProtocol {
     
     var _didReceiveRemoteNotificationWithCompletion: (([AnyHashable : Any], @escaping (UIBackgroundFetchResult) -> Void) -> Void)?
         
-    public func didReceiveRemoteNotification(_ handler: @escaping (_ userInfo: [AnyHashable : Any], _ completionHandler: (UIBackgroundFetchResult) -> Void) -> Void) -> Self {
+    public func didReceiveRemoteNotification(_ handler: @escaping (_ userInfo: [AnyHashable : Any], _ completionHandler: @escaping (UIBackgroundFetchResult) -> Void) -> Void) -> Self {
         _didReceiveRemoteNotificationWithCompletion = handler
         return self
     }
