@@ -134,11 +134,12 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._willEnterForeground?()
     }
     
-    public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    public func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         lifecycle?._openURLWithOptions?(url, options) ?? true
     }
     
-    public func application(_ app: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+    /// iOS9以下版本，废弃，不再支持
+    public func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
         lifecycle?._openURLSourceAppAnnotation?(url, sourceApplication, annotation) ?? true
     }
     
@@ -284,7 +285,7 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._willContinueUserActivity?(userActivityType) ?? true
     }
     
-    public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+    public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
         lifecycle?._continueUserActivity?(userActivity, restorationHandler) ?? true
     }
     

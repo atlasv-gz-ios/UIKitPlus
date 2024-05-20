@@ -69,5 +69,41 @@ class _SceneDelegate: UIResponder, UIWindowSceneDelegate {
             .first { $0.item.type == shortcutItem.type }?
             .action?(completionHandler)
     }
+
+    func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
+        BaseApp.shared.application(BaseApp.shared, willContinueUserActivityWithType: userActivityType)
+    }
+
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        BaseApp.shared.application(BaseApp.shared, continue: userActivity) { _ in
+        }
+    }
+
+    func scene(_ scene: UIScene, didFailToContinueUserActivityWithType userActivityType: String, error: any Error) {
+        BaseApp.shared.application(BaseApp.shared, didFailToContinueUserActivityWithType: userActivityType, error: error)
+    }
+    
+    func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
+        BaseApp.shared.application(BaseApp.shared, didUpdate: userActivity)
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        for context in URLContexts {
+            var options = [UIApplication.OpenURLOptionsKey: Any]()
+            if let sourceApplication = context.options.sourceApplication {
+                options[.sourceApplication] = sourceApplication
+            }
+            if let annotation = context.options.annotation {
+                options[.annotation] = annotation
+            }
+            if #available(iOS 14.5, *) {
+                if let eventAttribution = context.options.eventAttribution {
+                    options[.eventAttribution] = eventAttribution
+                }
+            }
+            options[.openInPlace] = context.options.openInPlace
+            BaseApp.shared.application(BaseApp.shared, open: context.url, options: options)
+        }
+    }
 }
 #endif
