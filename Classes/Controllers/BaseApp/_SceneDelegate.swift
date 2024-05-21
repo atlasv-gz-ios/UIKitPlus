@@ -71,39 +71,23 @@ class _SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
-        BaseApp.shared.application(BaseApp.shared, willContinueUserActivityWithType: userActivityType)
+        BaseApp.shared.mainScene._onWillContinueUserActivityWithType?(window, userActivityType)
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        BaseApp.shared.application(BaseApp.shared, continue: userActivity) { _ in
-        }
+        BaseApp.shared.mainScene._onContinueUserActivity?(window, userActivity)
     }
 
     func scene(_ scene: UIScene, didFailToContinueUserActivityWithType userActivityType: String, error: any Error) {
-        BaseApp.shared.application(BaseApp.shared, didFailToContinueUserActivityWithType: userActivityType, error: error)
+        BaseApp.shared.mainScene._onDidFailToContinueUserActivityWithType?(window, userActivityType, error)
     }
     
     func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
-        BaseApp.shared.application(BaseApp.shared, didUpdate: userActivity)
+        BaseApp.shared.mainScene._onDidUpdateUserActivity?(window, userActivity)
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        for context in URLContexts {
-            var options = [UIApplication.OpenURLOptionsKey: Any]()
-            if let sourceApplication = context.options.sourceApplication {
-                options[.sourceApplication] = sourceApplication
-            }
-            if let annotation = context.options.annotation {
-                options[.annotation] = annotation
-            }
-            if #available(iOS 14.5, *) {
-                if let eventAttribution = context.options.eventAttribution {
-                    options[.eventAttribution] = eventAttribution
-                }
-            }
-            options[.openInPlace] = context.options.openInPlace
-            BaseApp.shared.application(BaseApp.shared, open: context.url, options: options)
-        }
+        BaseApp.shared.mainScene._onOpenURLContexts?(window, URLContexts)
     }
 }
 #endif

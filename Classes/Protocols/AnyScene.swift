@@ -41,6 +41,12 @@ public protocol AnyScene: AnyObject {
     // Use this method to save data, release shared resources, and store enough scene-specific state information
     // to restore the scene back to its current state.
     func onDidEnterBackground(_ handler: @escaping (UIWindow?) -> Void) -> Self
+    
+    func onWillContinueUserActivityWithType(_ hander: @escaping (UIWindow?, _ userActivityType: String) -> Void) -> Self
+    func onContinueUserActivity(_ handler: @escaping (UIWindow?, _ userActivity: NSUserActivity) -> Void) -> Self
+    func onDidFailToContinueUserActivityWithType(_ handler: @escaping (UIWindow?, _ userActivityType: String, _ error: any Error) -> Void) -> Self
+    func onDidUpdateUserActivity(_ handler: @escaping (UIWindow?, _ userActivity: NSUserActivity) -> Void) -> Self
+    func onOpenURLContexts(_ handler: @escaping (UIWindow?, _ URLContexts: Set<UIOpenURLContext>) -> Void) -> Self
 }
 
 protocol _AnyScene: AnyScene {
@@ -51,6 +57,11 @@ protocol _AnyScene: AnyScene {
     var _onWillResignActive: ((UIWindow?) -> Void)? { get set }
     var _onWillEnterForeground: ((UIWindow?) -> Void)? { get set }
     var _onDidEnterBackground: ((UIWindow?) -> Void)? { get set }
+    var _onWillContinueUserActivityWithType: ((UIWindow?, _ userActivityType: String) -> Void)? { get set }
+    var _onContinueUserActivity: ((UIWindow?, _ userActivity: NSUserActivity) -> Void)? { get set }
+    var _onDidFailToContinueUserActivityWithType: ((UIWindow?, _ userActivityType: String, _ error: any Error) -> Void)? { get set }
+    var _onDidUpdateUserActivity: ((UIWindow?, _ userActivity: NSUserActivity) -> Void)? {get set }
+    var _onOpenURLContexts: ((UIWindow?, _ URLContexts: Set<UIOpenURLContext>) -> Void)? { get set }
 }
 
 @available(iOS 13.0, *)
@@ -136,6 +147,31 @@ extension AnyScene {
 
     public func onDidEnterBackground(_ handler: @escaping (UIWindow?) -> Void) -> Self {
         (self as? _AnyScene)?._onDidEnterBackground = handler
+        return self
+    }
+    
+    public func onWillContinueUserActivityWithType(_ hander: @escaping (UIWindow?, _ userActivityType: String) -> Void) -> Self {
+        (self as? _AnyScene)?._onWillContinueUserActivityWithType = hander
+        return self
+    }
+
+    public func onContinueUserActivity(_ handler: @escaping (UIWindow?, _ userActivity: NSUserActivity) -> Void) -> Self {
+        (self as? _AnyScene)?._onContinueUserActivity = handler
+        return self
+    }
+    
+    public func onDidFailToContinueUserActivityWithType(_ handler: @escaping (UIWindow?, _ userActivityType: String, _ error: any Error) -> Void) -> Self {
+        (self as? _AnyScene)?._onDidFailToContinueUserActivityWithType = handler
+        return self
+    }
+    
+    public func onDidUpdateUserActivity(_ handler: @escaping (UIWindow?, _ userActivity: NSUserActivity) -> Void) -> Self {
+        (self as? _AnyScene)?._onDidUpdateUserActivity = handler
+        return self
+    }
+    
+    public func onOpenURLContexts(_ handler: @escaping (UIWindow?, _ URLContexts: Set<UIOpenURLContext>) -> Void) -> Self {
+        (self as? _AnyScene)?._onOpenURLContexts = handler
         return self
     }
 }
@@ -224,5 +260,31 @@ extension _AnyScene {
         _onDidEnterBackground = handler
         return self
     }
+
+    public func onWillContinueUserActivityWithType(_ hander: @escaping (UIWindow?, _ userActivityType: String) -> Void) -> Self {
+        _onWillContinueUserActivityWithType = hander
+        return self
+    }
+
+    public func onContinueUserActivity(_ handler: @escaping (UIWindow?, _ userActivity: NSUserActivity) -> Void) -> Self {
+        _onContinueUserActivity = handler
+        return self
+    }
+    
+    public func onDidFailToContinueUserActivityWithType(_ handler: @escaping (UIWindow?, _ userActivityType: String, _ error: any Error) -> Void) -> Self {
+        _onDidFailToContinueUserActivityWithType = handler
+        return self
+    }
+    
+    public func onDidUpdateUserActivity(_ handler: @escaping (UIWindow?, _ userActivity: NSUserActivity) -> Void) -> Self {
+        _onDidUpdateUserActivity = handler
+        return self
+    }
+    
+    public func onOpenURLContexts(_ handler: @escaping (UIWindow?, _ URLContexts: Set<UIOpenURLContext>) -> Void) -> Self {
+        _onOpenURLContexts = handler
+        return self
+    }
 }
+
 #endif

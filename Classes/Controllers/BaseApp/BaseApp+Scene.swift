@@ -23,6 +23,12 @@ extension BaseApp {
         var _onWillResignActive: ((UIWindow?) -> Void)?
         var _onWillEnterForeground: ((UIWindow?) -> Void)?
         var _onDidEnterBackground: ((UIWindow?) -> Void)?
+        
+        var _onWillContinueUserActivityWithType: ((UIWindow?, _ userActivityType: String) -> Void)?
+        var _onContinueUserActivity: ((UIWindow?, _ userActivity: NSUserActivity) -> Void)?
+        var _onDidFailToContinueUserActivityWithType: ((UIWindow?, _ userActivityType: String, _ error: any Error) -> Void)?
+        var _onDidUpdateUserActivity: ((UIWindow?, _ userActivity: NSUserActivity) -> Void)?
+        var _onOpenURLContexts: ((UIWindow?, _ URLContexts: Set<UIOpenURLContext>) -> Void)?
     }
 }
 #endif
