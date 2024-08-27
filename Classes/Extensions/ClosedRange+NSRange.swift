@@ -1,5 +1,11 @@
 import Foundation
 
 extension ClosedRange where Bound == Int {
-    var nsRange: NSRange { return .init(location: first ?? 0, length: last ?? 0) }
+    var nsRange: NSRange { 
+        let length = upperBound - lowerBound
+        if length < 0 {
+            return .init(location: lowerBound, length: 0)
+        }
+        return .init(location: lowerBound, length: length)
+    }
 }
