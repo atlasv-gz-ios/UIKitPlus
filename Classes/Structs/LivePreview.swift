@@ -128,7 +128,7 @@ public struct UIKitPreviewDevice {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-public class Preview {
+public class UPreview {
     let view: BaseView
     var colorScheme: PreviewColorScheme = .light
     #if os(macOS)
@@ -137,7 +137,7 @@ public class Preview {
     var device: UIKitPreviewDevice = .iPhoneX
     #endif
     var layout: PreviewLayout = .device
-    var title: String = "Preview"
+    var title: String = "UPreview"
     var language: Language = Localization().detectCurrentLanguage()
     #if !os(macOS)
     var semanticContentAttribute: UISemanticContentAttribute = .unspecified
@@ -208,7 +208,7 @@ public class Preview {
 
 @available(iOS 13.0, macOS 10.15, *)
 public protocol DeclarativePreview: SwiftUI.PreviewProvider {
-    static var preview: Preview { get }
+    static var preview: UPreview { get }
 }
 
 @available(iOS 13.0, macOS 10.15, *)

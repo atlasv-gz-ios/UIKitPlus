@@ -7,22 +7,22 @@ import UIKit
 #if canImport(SwiftUI) && DEBUG
 @available(iOS 13.0, macOS 10.15, *)
 public protocol PreviewBuilderItem {
-    var previewBuilderItems: [Preview] { get }
+    var previewBuilderItems: [UPreview] { get }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 public struct PreviewBuilderItems: PreviewBuilderItem {
-    public let items: [Preview]
+    public let items: [UPreview]
     
-    public init (items: [Preview]) {
+    public init (items: [UPreview]) {
         self.items = items
     }
     
-    public var previewBuilderItems: [Preview] { items }
+    public var previewBuilderItems: [UPreview] { items }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-extension Preview: PreviewBuilderItem {
-    public var previewBuilderItems: [Preview] { [self] }
+extension UPreview: PreviewBuilderItem {
+    public var previewBuilderItems: [UPreview] { [self] }
 }
 #endif

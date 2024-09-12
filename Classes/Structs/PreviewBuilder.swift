@@ -7,7 +7,7 @@ import UIKit
 #if canImport(SwiftUI) && DEBUG
 @available(iOS 13.0, macOS 10.15, *)
 public class PreviewGroup {
-    let previews: [Preview]
+    let previews: [UPreview]
     var language: Language = Localization().detectCurrentLanguage()
     #if !os(macOS)
     var semanticContentAttribute: UISemanticContentAttribute = .unspecified
@@ -70,7 +70,7 @@ public class PreviewGroup {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-extension Array: PreviewBuilderItem where Element: Preview {
-    public var previewBuilderItems: [Preview] { self }
+extension Array: PreviewBuilderItem where Element: UPreview {
+    public var previewBuilderItems: [UPreview] { self }
 }
 #endif
