@@ -38,6 +38,7 @@ open class USegmentedControl: UISegmentedControl, AnyDeclarativeProtocol, Declar
     
     init(_ items: [SegmentControlable]) {
         super.init(items: [])
+        setup()
         for (offset, item) in items.enumerated() {
             switch item.item {
             case .title(let title): insertSegment(withTitle: title, at: offset, animated: false)
@@ -207,7 +208,8 @@ open class USegmentedControl: UISegmentedControl, AnyDeclarativeProtocol, Declar
         addAttribute(.strokeColor, value.color, for: state)
     }
     
-    /// NSNumber containing floating point value, in percent of font point size, default 0: no stroke; positive for stroke alone, negative for stroke and fill (a typical value for outlined text would be 3.0)
+    /// NSNumber containing floating point value, in percent of font point size, default 0: no stroke; positive for stroke alone, negative for stroke and fill
+    /// (a typical value for outlined text would be 3.0)
     @discardableResult
     public func strokeWidth(_ value: Float, for state: UIControl.State = .normal) -> Self {
         addAttribute(.strokeWidth, value, for: state)
@@ -294,7 +296,8 @@ open class USegmentedControl: UISegmentedControl, AnyDeclarativeProtocol, Declar
     }
     
     public enum GlyphForm: Int {
-        case horizontal, vertical
+        case horizontal
+        case vertical
     }
     
     @discardableResult
