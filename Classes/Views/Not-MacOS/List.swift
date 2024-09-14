@@ -17,9 +17,7 @@ public class UList: UView, UITableViewDataSource {
     var scrollPosition: State<CGPoint>?
     
     var items: [UListSection] = []
-    
-    private var trailingSwipeConfig: UISwipeActionsConfiguration?
-    private var leadingSwipeConfig: UISwipeActionsConfiguration?
+    private var swipeActionConfig: ((IndexPath) -> UISwipeActionsConfiguration?)?
     
     public override init(@BodyBuilder block: BodyBuilder.SingleView) {
         super.init(frame: .zero)
@@ -294,11 +292,7 @@ extension UList: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
     public func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool { false }
     public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        return trailingSwipeConfig
-    }
-    
-    public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        return leadingSwipeConfig
+        return swipeActionConfig?(indexPath)
     }
 }
 
@@ -352,14 +346,8 @@ public extension UList {
     }
     
     @discardableResult
-    func trailingSwipeConfig(_ config: UISwipeActionsConfiguration?) -> Self {
-        trailingSwipeConfig = config
-        return self
-    }
-    
-    @discardableResult
-    func leadingSwipeConfig(_ config: UISwipeActionsConfiguration?) -> Self {
-        leadingSwipeConfig = config
+    func swipeActionConfig(_ config: ((IndexPath) -> UISwipeActionsConfiguration?)?) -> Self {
+        swipeActionConfig = config
         return self
     }
 }
