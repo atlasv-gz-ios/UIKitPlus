@@ -5,7 +5,7 @@ class UListSection {
     var item: BodyBuilderItem
     let axis: NSLayoutConstraint.Axis
     
-    init (_ item: BodyBuilderItem, axis: NSLayoutConstraint.Axis? = nil) {
+    init(_ item: BodyBuilderItem, axis: NSLayoutConstraint.Axis? = nil) {
         self.item = item
         self.axis = axis ?? .vertical
     }
@@ -18,11 +18,14 @@ public class UList: UView, UITableViewDataSource {
     
     var items: [UListSection] = []
     
-    public override init (@BodyBuilder block: BodyBuilder.SingleView) {
+    private var trailingSwipeConfig: UISwipeActionsConfiguration?
+    private var leadingSwipeConfig: UISwipeActionsConfiguration?
+    
+    public override init(@BodyBuilder block: BodyBuilder.SingleView) {
         super.init(frame: .zero)
         process(block())
         $reversed.listen { [weak self] old, new in
-            self?.tableView.transform = CGAffineTransform(rotationAngle: new ? -(CGFloat)(Double.pi) : 0)
+            self?.tableView.transform = CGAffineTransform(rotationAngle: new ? -CGFloat(Double.pi) : 0)
             if let tableView = self?.tableView {
                 tableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.size.width - 8)
             }
@@ -33,11 +36,11 @@ public class UList: UView, UITableViewDataSource {
         setup()
     }
     
-    public init (@BodyBuilder block: (UList) -> BodyBuilder.Result) {
+    public init(@BodyBuilder block: (UList) -> BodyBuilder.Result) {
         super.init(frame: .zero)
         process(block(self))
         $reversed.listen { [weak self] old, new in
-            self?.tableView.transform = CGAffineTransform(rotationAngle: new ? -(CGFloat)(Double.pi) : 0)
+            self?.tableView.transform = CGAffineTransform(rotationAngle: new ? -CGFloat(Double.pi) : 0)
             if let tableView = self?.tableView {
                 tableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.size.width - 8)
             }
@@ -68,7 +71,7 @@ public class UList: UView, UITableViewDataSource {
             fr.subscribeToChanges({ [weak self] in
                 self?.tableView.beginUpdates()
             }, { [weak self] deletions, insertions, modifications in
-                self?.tableView.deleteRows(at: deletions.map { IndexPath(row: $0, section: sectionIndex)}, with: .fade)
+                self?.tableView.deleteRows(at: deletions.map { IndexPath(row: $0, section: sectionIndex) }, with: .fade)
                 self?.tableView.insertRows(at: insertions.map { IndexPath(row: $0, section: sectionIndex) }, with: .fade)
                 self?.tableView.reloadRows(at: modifications.map { IndexPath(row: $0, section: sectionIndex) }, with: .fade)
             }) { [weak self] in
@@ -90,16 +93,22 @@ public class UList: UView, UITableViewDataSource {
                 self?.tableView.beginUpdates()
             }
             v._hiddenState.listen { [weak self] old, new in
-                guard old != new else { return }
+                guard old != new else {
+                    return
+                }
                 switch new {
                 case true:
-                   guard isVisibleInList else { return }
-                   isVisibleInList = false
-                    self?.tableView.deleteRows(at: [0].map { IndexPath(row: $0, section: sectionIndex)}, with: .automatic)
+                    guard isVisibleInList else {
+                        return
+                    }
+                    isVisibleInList = false
+                    self?.tableView.deleteRows(at: [0].map { IndexPath(row: $0, section: sectionIndex) }, with: .automatic)
                 case false:
-                   guard !isVisibleInList else { return }
-                   isVisibleInList = true
-                   self?.tableView.insertRows(at: [0].map { IndexPath(row: $0, section: sectionIndex) }, with: .automatic)
+                    guard !isVisibleInList else {
+                        return
+                    }
+                    isVisibleInList = true
+                    self?.tableView.insertRows(at: [0].map { IndexPath(row: $0, section: sectionIndex) }, with: .automatic)
                 }
             }
             v._hiddenState.endTrigger { [weak self] in
@@ -110,9 +119,9 @@ public class UList: UView, UITableViewDataSource {
     
     /// Applies some defaults to the list
     public func setup() {
-        #if !os(tvOS)
+#if !os(tvOS)
         tableView.separatorStyle(.none)
-        #endif
+#endif
     }
     
     public lazy var tableView = UTableView()
@@ -166,14 +175,14 @@ public class UList: UView, UITableViewDataSource {
         tableView.endUpdates()
     }
     
-    // MARK: - Refresh Control
-    #if !os(tvOS)
+// MARK: - Refresh Control
+#if !os(tvOS)
     @discardableResult
     public func refreshControl(_ refreshControl: UIRefreshControl) -> Self {
         tableView.refreshControl(refreshControl)
         return self
     }
-    #endif
+#endif
     
     // MARK: - UITableViewDataSource
     
@@ -223,8 +232,8 @@ public class UList: UView, UITableViewDataSource {
         return cell
     }
     
-    // MARK: - Separator
-    #if !os(tvOS)
+// MARK: - Separator
+#if !os(tvOS)
     @discardableResult
     public func separatorColor(_ value: UIColor) -> Self {
         tableView.separatorColor(value)
@@ -236,7 +245,7 @@ public class UList: UView, UITableViewDataSource {
         tableView.separatorStyle(value)
         return self
     }
-    #endif
+#endif
     @discardableResult
     public func separatorInset(_ value: UIEdgeInsets) -> Self {
         tableView.separatorInset(value)
@@ -284,13 +293,20 @@ extension UList: UIScrollViewDelegate {
 extension UList: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
     public func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool { false }
+    public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        return trailingSwipeConfig
+    }
+    
+    public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        return leadingSwipeConfig
+    }
 }
 
-extension UList {
+public extension UList {
     // MARK: Indicators
     
     @discardableResult
-    public func hideIndicator(_ indicators: NSLayoutConstraint.Axis...) -> Self {
+    func hideIndicator(_ indicators: NSLayoutConstraint.Axis...) -> Self {
         if indicators.contains(.horizontal) {
             tableView.showsHorizontalScrollIndicator = false
         }
@@ -303,7 +319,7 @@ extension UList {
     // MARK: Indicators
     
     @discardableResult
-    public func hideAllIndicators() -> Self {
+    func hideAllIndicators() -> Self {
         tableView.showsHorizontalScrollIndicator = false
         tableView.showsVerticalScrollIndicator = false
         return self
@@ -312,27 +328,39 @@ extension UList {
     // MARK: Content Inset
     
     @discardableResult
-    public func contentInset(_ insets: UIEdgeInsets) -> Self {
+    func contentInset(_ insets: UIEdgeInsets) -> Self {
         tableView.contentInset = insets
         return self
     }
     
     @discardableResult
-    public func contentInset(top: CGFloat = 0, left: CGFloat = 0, right: CGFloat = 0, bottom: CGFloat = 0) -> Self {
+    func contentInset(top: CGFloat = 0, left: CGFloat = 0, right: CGFloat = 0, bottom: CGFloat = 0) -> Self {
         contentInset(.init(top: top, left: left, bottom: bottom, right: right))
     }
     
     // MARK: Scroll Indicator Inset
     
     @discardableResult
-    public func scrollIndicatorInsets(_ insets: UIEdgeInsets) -> Self {
+    func scrollIndicatorInsets(_ insets: UIEdgeInsets) -> Self {
         tableView.scrollIndicatorInsets = insets
         return self
     }
     
     @discardableResult
-    public func scrollIndicatorInsets(top: CGFloat = 0, left: CGFloat = 0, bottom: CGFloat = 0, right: CGFloat = 0) -> Self {
+    func scrollIndicatorInsets(top: CGFloat = 0, left: CGFloat = 0, bottom: CGFloat = 0, right: CGFloat = 0) -> Self {
         scrollIndicatorInsets(.init(top: top, left: left, bottom: bottom, right: right))
+    }
+    
+    @discardableResult
+    func trailingSwipeConfig(_ config: UISwipeActionsConfiguration?) -> Self {
+        trailingSwipeConfig = config
+        return self
+    }
+    
+    @discardableResult
+    func leadingSwipeConfig(_ config: UISwipeActionsConfiguration?) -> Self {
+        leadingSwipeConfig = config
+        return self
     }
 }
 #endif
