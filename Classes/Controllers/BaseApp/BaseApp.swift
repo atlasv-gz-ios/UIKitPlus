@@ -83,7 +83,8 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
     public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         shortcutItems = []
         parseAppBuilderItem(body.appBuilderContent)
-        mainScene.initialize()
+        // 根据 initialize 备注 应该在 didFinishLaunchingWithOptions 执行
+//        mainScene.initialize()
         if lifecycle?._willFinishLaunchingWithOptions?(launchOptions ?? [:]) == false {
             return false
         }
@@ -104,10 +105,13 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         NotificationCenter.default.addObserver(forName: UIDevice.proximityStateDidChangeNotification, object: nil, queue: .main) { _ in
             self.deviceProximityState = UIDevice.current.proximityState
         }
-        if lifecycle?._didFinishLaunchingWithOptions?(launchOptions ?? [:]) == false {
-            return false
-        }
+//        if lifecycle?._didFinishLaunchingWithOptions?(launchOptions ?? [:]) == false {
+//            return false
+//        }
+        lifecycle?._didFinishLaunchingWithOptions?(launchOptions ?? [:])
         lifecycle?._didFinishLaunching?()
+        // 根据 initialize 备注 应该在 didFinishLaunchingWithOptions 执行
+        mainScene.initialize()
         if #available(iOS 13.0, *) {} else {
             window = UIWindow(frame: UIScreen.main.bounds)
             mainScene.viewController.attach(to: window)
