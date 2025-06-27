@@ -2,7 +2,7 @@
 import UIKit
 
 extension UIAlertController: _Messageable, _UIAlertViewControllerable {
-    /// See `_Messageable`
+    // See `_Messageable`
     
     var _statedMessage: AnyStringBuilder.Handler? {
         get { nil }
@@ -128,104 +128,109 @@ protocol _UIAlertViewControllerable: UIAlertViewControllerable {
     func _present(in vc: UIViewController, animated: Bool, completion: (() -> Void)?) -> Self
 }
 
-extension UIAlertViewControllerable {
+public extension UIAlertViewControllerable where Self: UIAlertController {
     @discardableResult
-    public func action(_ title: String?, _ style: UIAlertAction.Style, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
+    func action(_ title: String?, _ style: UIAlertAction.Style, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
         action(title, style) { action, controller in
             handler(action)
         }
     }
     
-    public func action(_ title: String?, _ style: UIAlertAction.Style, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
-        addAction(AlertAction(title: title, style: style) {
+    func action(_ title: String?, _ style: UIAlertAction.Style, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
+        addAction(AlertAction(title: title, style: style) { [weak self] in
+            guard let self else {
+                return
+            }
             handler($0, self.controller)
         })
         return self
     }
     
     @discardableResult
-    public func action(_ title: String?, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
+    func action(_ title: String?, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
         action(title, .default, handler)
     }
     
     @discardableResult
-    public func action(_ title: String?, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
+    func action(_ title: String?, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
         action(title, .default, handler)
     }
     
     @discardableResult
-    public func action(_ title: String?) -> Self {
+    func action(_ title: String?) -> Self {
         action(title, .default) {}
     }
     
     @discardableResult
-    public func action(_ title: String?, _ style: UIAlertAction.Style, _ handler: @escaping (() -> Void)) -> Self {
+    func action(_ title: String?, _ style: UIAlertAction.Style, _ handler: @escaping (() -> Void)) -> Self {
         action(title, style) { _ in handler() }
     }
     
     @discardableResult
-    public func action(_ title: String?, _ handler: @escaping (() -> Void)) -> Self {
+    func action(_ title: String?, _ handler: @escaping (() -> Void)) -> Self {
         action(title, .default, handler)
     }
     
     @discardableResult
-    public func destructive(_ title: String?, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
+    func destructive(_ title: String?, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
         action(title, .destructive, handler)
     }
     
     @discardableResult
-    public func destructive(_ title: String?, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
+    func destructive(_ title: String?, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
         action(title, .destructive, handler)
     }
     
     @discardableResult
-    public func destructive(_ title: String?, _ handler: @escaping (() -> Void)) -> Self {
+    func destructive(_ title: String?, _ handler: @escaping (() -> Void)) -> Self {
         action(title, .destructive, handler)
     }
     
     @discardableResult
-    public func destructive(_ title: String?) -> Self {
+    func destructive(_ title: String?) -> Self {
         destructive(title) { _ in }
     }
     
     @discardableResult
-    public func cancel(_ title: String?, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
+    func cancel(_ title: String?, _ handler: @escaping ((AlertAction) -> Void)) -> Self {
         action(title, .cancel, handler)
     }
     
     @discardableResult
-    public func cancel(_ title: String?, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
+    func cancel(_ title: String?, _ handler: @escaping ((AlertAction, UIAlertController) -> Void)) -> Self {
         action(title, .cancel, handler)
     }
     
     @discardableResult
-    public func cancel(_ title: String?, _ handler: @escaping (() -> Void)) -> Self {
+    func cancel(_ title: String?, _ handler: @escaping (() -> Void)) -> Self {
         action(title, handler)
     }
     
     @discardableResult
-    public func cancel(_ title: String?) -> Self {
+    func cancel(_ title: String?) -> Self {
         action(title, .cancel) {}
     }
     
     @discardableResult
-    public func present(in vc: UIViewController, animated: Bool, completion: @escaping (() -> Void)) -> Self {
-        guard let s = self as? _UIAlertViewControllerable else { return self }
+    func present(in vc: UIViewController, animated: Bool, completion: @escaping (() -> Void)) -> Self {
+        guard let s = self as? _UIAlertViewControllerable else {
+            return self
+        }
         return s._present(in: vc, animated: animated, completion: completion) as! Self
     }
     
     @discardableResult
-    public func present(in vc: UIViewController, animated: Bool) -> Self {
+    func present(in vc: UIViewController, animated: Bool) -> Self {
         present(in: vc, animated: animated) {}
     }
     
     @discardableResult
-    public func present(in vc: UIViewController, completion: @escaping (() -> Void)) -> Self {
+    func present(in vc: UIViewController, completion: @escaping (() -> Void)) -> Self {
         present(in: vc, animated: true, completion: completion)
     }
     
     @discardableResult
-    public func present(in vc: UIViewController) -> Self {
+    func present(in vc: UIViewController) -> Self {
         present(in: vc) {}
     }
 }
