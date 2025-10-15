@@ -21,7 +21,7 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
     @UState public var pushAuthorizationStatus: PushNotificationsAuthorizationStatus = .notDetermined
     @UState public var pushNotificationToken: String?
     
-    public internal(set) lazy var mainScene: MainScene = MainScene()
+    public internal(set) lazy var mainScene: MainScene = .init()
     
     public override init() {
         super.init()
@@ -58,7 +58,9 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
     private func _setShourtcuts() {
         shortcutItems?.append(contentsOf: shortcuts.map { shortcut in
             shortcut._update = {
-                guard let indexToRemove = self.shortcutItems?.firstIndex(where: { $0.type == shortcut.item.type }) else { return }
+                guard let indexToRemove = self.shortcutItems?.firstIndex(where: { $0.type == shortcut.item.type }) else {
+                    return
+                }
                 self.shortcutItems?.remove(at: indexToRemove)
                 if let indexArray = self.shortcuts.firstIndex(where: { $0 === shortcut }) {
                     self.shortcutItems?.insert(shortcut.item, at: indexArray)
@@ -69,7 +71,9 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
             }
             shortcut._enable = {
                 self.shortcutItems?.removeAll(where: { $0.type == shortcut.item.type })
-                guard let index = self.shortcuts.firstIndex(where: { $0 === shortcut }) else { return }
+                guard let index = self.shortcuts.firstIndex(where: { $0 === shortcut }) else {
+                    return
+                }
                 self.shortcutItems?.insert(shortcut.item, at: index)
             }
             return shortcut.item
@@ -80,7 +84,7 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
     
     public var window: UIWindow?
     
-    public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    public func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         shortcutItems = []
         parseAppBuilderItem(body.appBuilderContent)
         // 根据 initialize 备注 应该在 didFinishLaunchingWithOptions 执行
@@ -138,7 +142,7 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._willEnterForeground?()
     }
     
-    public func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    public func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         lifecycle?._openURLWithOptions?(url, options) ?? true
     }
     
@@ -159,7 +163,8 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._significantTimeChange?()
     }
     
-    public func application(_ application: UIApplication, willChangeStatusBarOrientation newStatusBarOrientation: UIInterfaceOrientation, duration: TimeInterval) {
+    public func application(_ application: UIApplication, willChangeStatusBarOrientation newStatusBarOrientation: UIInterfaceOrientation,
+                            duration: TimeInterval) {
         lifecycle?._willChangeStatusBarOrientation?(newStatusBarOrientation, duration)
     }
     
@@ -190,7 +195,7 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._didFailToRegisterForRemoteNotifications?(error)
     }
     
-    public func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
+    public func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
         lifecycle?._didReceiveRemoteNotification?(userInfo)
     }
     
@@ -198,34 +203,42 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._didReceiveNotification?(notification)
     }
     
-    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, for notification: UILocalNotification, withResponseInfo responseInfo: [AnyHashable : Any], completionHandler: @escaping () -> Void) {
+    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, for notification: UILocalNotification,
+                            withResponseInfo responseInfo: [AnyHashable: Any], completionHandler: @escaping () -> Void) {
         lifecycle?._handleLocalActionWithResponseInfo?(identifier, notification, responseInfo, completionHandler)
     }
     
-    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, for notification: UILocalNotification, completionHandler: @escaping () -> Void) {
+    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, for notification: UILocalNotification,
+                            completionHandler: @escaping () -> Void) {
         lifecycle?._handleLocalAction?(identifier, notification, completionHandler)
     }
     
-    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, forRemoteNotification userInfo: [AnyHashable : Any], withResponseInfo responseInfo: [AnyHashable : Any], completionHandler: @escaping () -> Void) {
+    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, forRemoteNotification userInfo: [AnyHashable: Any],
+                            withResponseInfo responseInfo: [AnyHashable: Any], completionHandler: @escaping () -> Void) {
         lifecycle?._handleRemoteActionWithResponseInfo?(identifier, userInfo, responseInfo, completionHandler)
     }
     
-    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, forRemoteNotification userInfo: [AnyHashable : Any], completionHandler: @escaping () -> Void) {
+    public func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, forRemoteNotification userInfo: [AnyHashable: Any],
+                            completionHandler: @escaping () -> Void) {
         lifecycle?._handleRemoteAction?(identifier, userInfo, completionHandler)
     }
     
-    public func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    public func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                            fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         lifecycle?._didReceiveRemoteNotificationWithCompletion?(userInfo, completionHandler)
     }
     
-//        @available(iOS, introduced: 7.0, deprecated: 13.0, message: "Use a BGAppRefreshTask in the BackgroundTasks framework instead")
+    ///        @available(iOS, introduced: 7.0, deprecated: 13.0, message: "Use a BGAppRefreshTask in the BackgroundTasks framework instead")
     public func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         lifecycle?._performFetch?(completionHandler)
     }
     
-    public func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+    public func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem,
+                            completionHandler: @escaping (Bool) -> Void) {
         lifecycle?._performActionForShortcutItem?(shortcutItem, completionHandler)
-        guard let shortcut = shortcuts.first(where: { $0.item.type == shortcutItem.type }) else { return }
+        guard let shortcut = shortcuts.first(where: { $0.item.type == shortcutItem.type }) else {
+            return
+        }
         shortcut.action?(completionHandler)
     }
     
@@ -233,7 +246,8 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._handleEventsForBackgroundURLSession?(identifier, completionHandler)
     }
     
-    public func application(_ application: UIApplication, handleWatchKitExtensionRequest userInfo: [AnyHashable : Any]?, reply: @escaping ([AnyHashable : Any]?) -> Void) {
+    public func application(_ application: UIApplication, handleWatchKitExtensionRequest userInfo: [AnyHashable: Any]?,
+                            reply: @escaping ([AnyHashable: Any]?) -> Void) {
         lifecycle?._handleWatchKitExtensionRequest?(userInfo ?? [:], reply)
     }
     
@@ -253,11 +267,13 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._supportedInterfaceOrientations?(window) ?? .allButUpsideDown
     }
     
-    public func application(_ application: UIApplication, shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier) -> Bool {
+    public func application(_ application: UIApplication,
+                            shouldAllowExtensionPointIdentifier extensionPointIdentifier: UIApplication.ExtensionPointIdentifier) -> Bool {
         lifecycle?._shouldAllowExtensionPointIdentifier?(extensionPointIdentifier) ?? true
     }
     
-    public func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [String], coder: NSCoder) -> UIViewController? {
+    public func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [String],
+                            coder: NSCoder) -> UIViewController? {
         lifecycle?._viewControllerWithRestorationIdentifierPath?(identifierComponents, coder) ?? nil
     }
     
@@ -289,7 +305,8 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
         lifecycle?._willContinueUserActivity?(userActivityType) ?? true
     }
     
-    public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
+    public func application(_ application: UIApplication, continue userActivity: NSUserActivity,
+                            restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
         lifecycle?._continueUserActivity?(userActivity, restorationHandler) ?? true
     }
     
@@ -321,17 +338,20 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
     }
     
     @available(iOS 13.0, *)
-    public func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    public func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
+                            options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let config = UISceneConfiguration(name: nil, sessionRole: UISceneSession.Role.windowApplication)
+        config.delegateClass = UIKitPlus._SceneDelegate.self
+        config.sceneClass = UIKitPlus._Scene.self
+#if DEBUG
         NSLog("options.urlContexts: \(options.urlContexts)")
         NSLog("options.sourceApplication: \(options.sourceApplication)")
         NSLog("options.handoffUserActivityType: \(options.handoffUserActivityType)")
         NSLog("options.userActivities: \(options.userActivities)")
         NSLog("options.notificationResponse: \(options.notificationResponse)")
         NSLog("options.shortcutItem: \(options.shortcutItem)")
-        let config = UISceneConfiguration(name: nil, sessionRole: UISceneSession.Role.windowApplication)
-        config.delegateClass = UIKitPlus._SceneDelegate.self
-        config.sceneClass = UIKitPlus._Scene.self
         print("config: \(config)")
+#endif
         return config
     }
     
@@ -341,7 +361,9 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
             (session.persistentIdentifier, (session.scene as? UIWindowScene)?.windows.first)
         }
         scenes.compactMap { scene -> (_AnyScene, UIWindow?)? in
-            guard let pid = pids.first(where: { $0.0 == scene.persistentIdentifier }) else { return nil }
+            guard let pid = pids.first(where: { $0.0 == scene.persistentIdentifier }) else {
+                return nil
+            }
             return (scene, pid.1)
         }.forEach {
             $0.0._onDestroy?($0.1)
@@ -356,7 +378,7 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
     
     public static func requestPushNotificationsAuthorization(_ options: [PushNotificationOption]) {
         if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().requestAuthorization(options: options.unOption) { granted,_ in
+            UNUserNotificationCenter.current().requestAuthorization(options: options.unOption) { granted, _ in
                 guard granted else {
                     BaseApp.shared.refreshPushStates()
                     return
@@ -372,9 +394,15 @@ open class BaseApp: UIApplication, UIApplicationDelegate {
     // MARK: Convenience shortcut to Settings
     
     public static func openSettings() {
-        guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return }
-        guard let appSettings = URL(string: UIApplication.openSettingsURLString + bundleIdentifier) else { return }
-        guard UIApplication.shared.canOpenURL(appSettings) else { return }
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
+            return
+        }
+        guard let appSettings = URL(string: UIApplication.openSettingsURLString + bundleIdentifier) else {
+            return
+        }
+        guard UIApplication.shared.canOpenURL(appSettings) else {
+            return
+        }
         if #available(iOS 10.0, *) {
             UIApplication.shared.open(appSettings)
         } else {
